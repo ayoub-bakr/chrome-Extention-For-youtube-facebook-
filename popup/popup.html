@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Focus Mode</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Header -->
+    <header class="popup-header">
+      <div class="header-brand">
+        <div class="brand-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="12" cy="12" r="9"/>
+            <circle cx="12" cy="12" r="3"/>
+            <line x1="12" y1="1" x2="12" y2="4"/>
+            <line x1="12" y1="20" x2="12" y2="23"/>
+            <line x1="1" y1="12" x2="4" y2="12"/>
+            <line x1="20" y1="12" x2="23" y2="12"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="brand-title">Focus Mode</h1>
+          <p class="brand-subtitle" id="global-status-text">Active & Protecting</p>
+        </div>
+      </div>
+      <!-- Global Master Switch -->
+      <label class="switch" title="Toggle Focus Mode Globally">
+        <input type="checkbox" id="global-toggle" checked />
+        <span class="slider round"></span>
+      </label>
+    </header>
+
+    <!-- Pause Section -->
+    <section class="pause-section" id="pause-section">
+      <div class="pause-header">
+        <span class="pause-label" id="pause-status-label">Temporary Pause:</span>
+        <span class="pause-time" id="pause-time-remaining"></span>
+      </div>
+      <div class="pause-buttons" id="pause-button-group">
+        <button type="button" class="pause-btn" data-minutes="15">15m</button>
+        <button type="button" class="pause-btn" data-minutes="30">30m</button>
+        <button type="button" class="pause-btn" data-minutes="60">1h</button>
+        <button type="button" class="pause-btn resume-btn" id="resume-btn" style="display: none;">Resume Now</button>
+      </div>
+    </section>
+
+    <!-- Site Selector Tabs -->
+    <div class="site-tabs" role="tablist">
+      <button type="button" class="tab-btn active" id="tab-youtube" role="tab" aria-selected="true" data-site="youtube">
+        <span class="tab-dot" id="dot-youtube"></span>
+        YouTube
+      </button>
+      <button type="button" class="tab-btn" id="tab-facebook" role="tab" aria-selected="false" data-site="facebook">
+        <span class="tab-dot" id="dot-facebook"></span>
+        Facebook
+      </button>
+    </div>
+
+    <!-- Site Settings Panels -->
+    <main class="settings-main">
+      <!-- Site Master Switch -->
+      <div class="site-master-bar">
+        <div>
+          <span class="site-master-title" id="current-site-title">YouTube Filtering</span>
+          <p class="site-master-desc" id="current-site-desc">Applies on youtube.com</p>
+        </div>
+        <label class="switch small" title="Enable filtering for this site">
+          <input type="checkbox" id="site-toggle" checked />
+          <span class="slider round"></span>
+        </label>
+      </div>
+
+      <!-- Feature Toggles List -->
+      <div class="toggles-list" id="toggles-list">
+        <!-- 1. Block Shorts & Reels -->
+        <div class="toggle-item" id="item-block-shorts">
+          <div class="toggle-info">
+            <span class="toggle-label" id="label-shorts">Block Shorts</span>
+            <span class="toggle-desc" id="desc-shorts">Hides Shorts shelves, badges, and intercepts direct links.</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="toggle-shorts" checked />
+            <span class="slider round"></span>
+          </label>
+        </div>
+
+        <!-- 2. Hide Recommended Feed -->
+        <div class="toggle-item" id="item-hide-feed">
+          <div class="toggle-info">
+            <span class="toggle-label">Hide recommended feed</span>
+            <span class="toggle-desc" id="desc-feed">Removes algorithmic home grid; preserves search & subscriptions.</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="toggle-feed" checked />
+            <span class="slider round"></span>
+          </label>
+        </div>
+
+        <!-- 3. Hide Suggested Content -->
+        <div class="toggle-item" id="item-hide-suggested">
+          <div class="toggle-info">
+            <div class="label-with-badge">
+              <span class="toggle-label">Hide suggested content</span>
+              <span class="badge partial" id="badge-suggested" style="display: none;">Locale-dependent</span>
+            </div>
+            <span class="toggle-desc" id="desc-suggested">Hides recommendation cards and in-video suggestions.</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="toggle-suggested" checked />
+            <span class="slider round"></span>
+          </label>
+        </div>
+
+        <!-- 4. Hide Recommendation Sidebar -->
+        <div class="toggle-item" id="item-hide-sidebar">
+          <div class="toggle-info">
+            <div class="label-with-badge">
+              <span class="toggle-label">Hide recommendation sidebar</span>
+              <span class="badge unsupported" id="badge-sidebar" style="display: none;">Unsupported</span>
+            </div>
+            <span class="toggle-desc" id="desc-sidebar">Hides related videos column on watch pages.</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="toggle-sidebar" checked />
+            <span class="slider round"></span>
+          </label>
+        </div>
+
+        <!-- 5. Search-First Mode -->
+        <div class="toggle-item" id="item-search-first">
+          <div class="toggle-info">
+            <span class="toggle-label">Search-first mode</span>
+            <span class="toggle-desc" id="desc-search">Auto-focuses search bar and displays focused intent card.</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="toggle-search-first" checked />
+            <span class="slider round"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Feature Support Explanation Notice -->
+      <div class="support-notice" id="support-notice" style="display: none;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="16" x2="12" y2="12"/>
+          <line x1="12" y1="8" x2="12.01" y2="8"/>
+        </svg>
+        <span id="support-notice-text"></span>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="popup-footer">
+      <span class="footer-version">Focus Mode v1.0 • Intentional Browsing</span>
+      <span class="footer-status" id="active-tab-indicator">Active</span>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
