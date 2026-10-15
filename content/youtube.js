@@ -93,6 +93,62 @@
 
       // Manage Home Search-First UI
       this.handleHomeFeed();
+
+      // Tag any Shorts elements in DOM
+      this.filterShortsInDOM();
+    }
+
+    filterShortsInDOM() {
+      if (!this.active || !this.config.blockShorts) return;
+
+      // Select candidate cards/containers that could be shorts or shorts shelves
+      const candidates = document.querySelectorAll(`
+        ytd-video-renderer:not([data-focus-checked]),
+        ytd-compact-video-renderer:not([data-focus-checked]),
+        ytd-grid-video-renderer:not([data-focus-checked]),
+        ytd-rich-item-renderer:not([data-focus-checked]),
+        ytd-reel-shelf-renderer:not([data-focus-checked]),
+        ytd-shelf-renderer:not([data-focus-checked])
+      `);
+
+      candidates.forEach((el) => {
+        el.setAttribute('data-focus-checked', 'true');
+
+        // Check 1: Explicit shorts shelf or reel items
+        if (
+          el.tagName.toLowerCase() === 'ytd-reel-shelf-renderer' ||
+          el.hasAttribute('is-shorts') ||
+          el.querySelector('ytd-reel-item-renderer')
+        ) {
+          el.setAttribute('data-focus-is-short', 'true');
+          return;
+        }
+
+        // Check 2: Header title indicates shorts shelf
+        const titleSpan = el.querySelector('#title-text, #title, #shelf-title');
+        if (titleSpan && titleSpan.textContent.trim().toLowerCase() === 'shorts') {
+          el.setAttribute('data-focus-is-short', 'true');
+          return;
+        }
+
+        // Check 3: Card contains link to /shorts/
+        const shortsLink = el.querySelector('a[href*="/shorts/"]');
+        if (shortsLink) {
+          el.setAttribute('data-focus-is-short', 'true');
+          return;
+        }
+
+        // Check 4: YouTube Shorts badge / overlay
+        const shortsOverlay = el.querySelector('[overlay-style="SHORTS"], [aria-label*="Shorts" i]');
+        if (shortsOverlay) {
+          // Verify it's not just a general label like "Search" or ordinary title
+          if (shortsOverlay.getAttribute('overlay-style') === 'SHORTS' ||
+              shortsOverlay.classList.contains('ytd-thumbnail-overlay-time-status-renderer')) {
+            el.setAttribute('data-focus-is-short', 'true');
+            return;
+          }
+        }
+      });
     }
 
     handleShortsRoute() {
@@ -101,14 +157,30 @@
 
       // If should block direct Shorts URL
       if (shouldBlock) {
-        // Pause any active video
-        const videoEl = document.querySelector('video');
-        if (videoEl && !videoEl.paused) {
-          try {
-            videoEl.pause();
-          } catch (e) {
-            // Ignore error if pause is restricted
-          }
+        // Pause and silence any active video
+        const pauseAllVideos = () => {
+          const videos = document.querySelectorAll('video');
+          videos.forEach((v) => {
+            try {
+              v.muted = true;
+              v.pause();
+            } catch (e) {}
+          });
+        };
+
+        pauseAllVideos();
+
+        // Attach listener to prevent auto-play on direct shorts
+        if (!this._shortsPlayListener) {
+          this._shortsPlayListener = (e) => {
+            if (this.route === 'shorts' && this.active && this.config.blockShorts) {
+              try {
+                e.target.pause();
+                e.target.muted = true;
+              } catch (err) {}
+            }
+          };
+          window.addEventListener('play', this._shortsPlayListener, true);
         }
 
         const videoId = getShortsVideoId();
@@ -131,6 +203,10 @@
           this.shortsOverlayEl.remove();
           this.shortsOverlayEl = null;
         }
+        if (this._shortsPlayListener) {
+          window.removeEventListener('play', this._shortsPlayListener, true);
+          this._shortsPlayListener = null;
+        }
       }
     }
 
@@ -151,11 +227,12 @@
           </div>
           <h2 id="focus-shorts-title" class="focus-mode-title">Shorts Are Blocked</h2>
           <p class="focus-mode-desc">
-            Focus Mode protects your attention from infinite algorithmic vertical scrolls. You can watch this video in the standard player or search intentionally.
+            Focus Mode protects your attention from infinite algorithmic vertical scrolls. You can watch this video in the standard player, return to your previous page, or search intentionally.
           </p>
           <div class="focus-mode-links" style="margin-bottom: 24px;">
             ${videoId ? `<a href="${watchUrl}" class="focus-mode-button primary" id="focus-open-regular">Watch in Normal Player</a>` : '<a href="#" class="focus-mode-button primary" id="focus-open-regular" style="display:none;">Watch in Normal Player</a>'}
-            <a href="/feed/subscriptions" class="focus-mode-button secondary">Open Subscriptions</a>
+            <button type="button" class="focus-mode-button secondary" id="focus-shorts-back">Go Back</button>
+            <a href="/feed/subscriptions" class="focus-mode-button secondary">Subscriptions</a>
           </div>
           <form class="focus-mode-search-form" id="focus-shorts-search-form">
             <input type="text" class="focus-mode-search-input" placeholder="Search YouTube instead..." aria-label="Search YouTube" />
@@ -165,6 +242,17 @@
       `;
 
       // Event handlers
+      const backBtn = overlay.querySelector('#focus-shorts-back');
+      if (backBtn) {
+        backBtn.addEventListener('click', () => {
+          if (window.history.length > 1) {
+            window.history.back();
+          } else {
+            window.location.href = '/';
+          }
+        });
+      }
+
       const form = overlay.querySelector('#focus-shorts-search-form');
       const input = overlay.querySelector('.focus-mode-search-input');
       form.addEventListener('submit', (e) => {
@@ -283,6 +371,9 @@
           this.renderShortsOverlay(getShortsVideoId());
         }
       }
+
+      // Filter any Shorts cards or shelves dynamically rendered in the DOM (e.g. search results, lazy scroll)
+      this.filterShortsInDOM();
     }
   }
 

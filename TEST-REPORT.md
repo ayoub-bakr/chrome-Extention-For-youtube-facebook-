@@ -5,7 +5,7 @@
 **Test Runner**: Node.js v24.19.0 built-in test runner (`node:test`)  
 **Live Browser Target**: Google Chrome `155.0.8059.40` (Official Windows x64 Build)  
 **Project Path**: `C:\Users\ayoub\.gemini\antigravity\scratch\focus-mode`  
-**Overall Status**: **ALL TEST SUITES PASSED (44 Unit/Regression Tests + Live Chrome CDP Browser Audit)**
+**Overall Status**: **ALL TEST SUITES PASSED (48 Unit/Regression Tests + Live Chrome CDP Browser Audit)**
 
 ---
 
@@ -19,13 +19,14 @@
   ▶ YouTube DOM Element Selection & Non-Overblocking Preservation (6 tests passed)
   ▶ Facebook DOM Element Selection & Non-Overblocking Preservation (5 tests passed)
   ▶ Regression Tests for Confirmed Bug Fixes (4 tests passed)
+  ▶ YouTube Shorts Search Blocking & Direct Navigation Interception (3 tests passed)
   ▶ Settings Gating & State Resolution (6 tests passed)
   ▶ YouTube Route Classification (6 tests passed)
   ▶ Facebook Route Classification (5 tests passed)
-  ℹ tests 44
-  ℹ pass 44
+  ℹ tests 48
+  ℹ pass 48
   ℹ fail 0
-  ℹ duration_ms 320.45ms
+  ℹ duration_ms 335.7ms
   ```
 
 ### Command 2: `npm run test:e2e`
@@ -51,11 +52,12 @@
 | **Temporary Pause (15m, 30m, 1h) & Resume** | **VERIFIED IN BROWSER** | Simulated button clicks in Chrome; verified timestamp math, badge change, and resume restoration. |
 | **YouTube Home Feed Hiding** | **VERIFIED IN BROWSER** | `ytd-rich-grid-renderer` computed style confirmed `display: none` in Chrome. |
 | **YouTube Shorts Shelves & Nav Blocking** | **VERIFIED IN BROWSER** | Shelves and guide entries confirmed `display: none` in Chrome. |
+| **YouTube Shorts Blocking in Search Results** | **VERIFIED IN BROWSER** | Search Shorts cards, badges, and reel shelves confirmed `display: none` while normal videos remain visible. |
+| **YouTube Direct Shorts Interception & Overlay** | **VERIFIED IN BROWSER** | Tested container hiding, overlay display with "Watch in Normal Player" (`/watch?v=:id`) and "Go Back", and playback pausing. |
 | **YouTube Watch Related Videos Sidebar** | **VERIFIED IN BROWSER** | Both `ytd-watch-flexy` and `ytd-watch-grid` sidebars confirmed `display: none` in Chrome. |
 | **YouTube Video Playback Preservation** | **VERIFIED IN BROWSER** | `#movie_player video` computed style confirmed visible/playable (not `none`) in Chrome. |
 | **YouTube Search Input & Masthead Preservation** | **VERIFIED IN BROWSER** | `#search` input and `#masthead` confirmed visible (not `none`) in Chrome. |
 | **YouTube Genuine Search Results Preservation** | **VERIFIED IN BROWSER** | `ytd-video-renderer` items confirmed visible (not `none`) in Chrome. |
-| **YouTube Direct Shorts Interception & Video ID Conversion** | **VERIFIED BY UNIT TEST** | Tested route extraction (`/shorts/:id`) and dynamic update of `/watch?v=:id` button upon SPA navigation. |
 | **Facebook Home Feed Hiding** | **VERIFIED IN BROWSER** | `div[role="feed"]` computed style confirmed `display: none` in Chrome. |
 | **Facebook Reels Tray & Entry Points Blocking** | **VERIFIED IN BROWSER** | `div[aria-label*="Reels"]` and `a[href*="/reel/"]` confirmed `display: none` in Chrome. |
 | **Facebook Banner & Search Preservation** | **VERIFIED IN BROWSER** | `div[role="banner"]` and `input[type="search"]` confirmed visible (not `none`) in Chrome. |

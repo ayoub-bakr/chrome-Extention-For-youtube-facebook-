@@ -345,10 +345,24 @@ async function runExtensionBrowserTest() {
         </ytd-watch-grid>
         <ytd-search>
           <div id="search-contents">
-            <ytd-video-renderer id="genuine-search-result-1">Result 1</ytd-video-renderer>
+            <ytd-video-renderer id="genuine-search-result-1">
+              <a href="/watch?v=real123">Normal Video</a>
+              <span>Short Documentary Film</span>
+            </ytd-video-renderer>
+            <ytd-video-renderer id="shorts-search-result-1">
+              <a href="/shorts/abc1234">Shorts Video</a>
+            </ytd-video-renderer>
+            <ytd-video-renderer id="shorts-badge-result-1">
+              <span overlay-style="SHORTS">Shorts</span>
+              <a href="/watch?v=someShort">Shorts with Badge</a>
+            </ytd-video-renderer>
+            <ytd-reel-shelf-renderer id="shorts-reel-shelf-search">
+              <span>Shorts Shelf</span>
+            </ytd-reel-shelf-renderer>
             <ytd-shelf-renderer id="people-also-watched">People also watched</ytd-shelf-renderer>
           </div>
         </ytd-search>
+        <ytd-shorts id="direct-shorts-container">Shorts Feed Player</ytd-shorts>
       \`;
     `);
 
@@ -404,17 +418,41 @@ async function runExtensionBrowserTest() {
     // Scenario C: Active on Search Route
     await testClient.eval(`document.documentElement.dataset.focusRoute = "search";`);
     const searchResultDisplay = await testClient.eval('window.getComputedStyle(document.getElementById("genuine-search-result-1")).display');
+    const shortsSearchDisplay = await testClient.eval('window.getComputedStyle(document.getElementById("shorts-search-result-1")).display');
+    const shortsBadgeDisplay = await testClient.eval('window.getComputedStyle(document.getElementById("shorts-badge-result-1")).display');
+    const shortsReelShelfDisplay = await testClient.eval('window.getComputedStyle(document.getElementById("shorts-reel-shelf-search")).display');
     const suggestedShelfDisplay = await testClient.eval('window.getComputedStyle(document.getElementById("people-also-watched")).display');
 
     console.log('  -> [YouTube Search Active]');
+    console.log(`     - Shorts search card (/shorts/) display: "${shortsSearchDisplay}" (Expected: "none")`);
+    console.log(`     - Shorts badge card display: "${shortsBadgeDisplay}" (Expected: "none")`);
+    console.log(`     - Shorts reel shelf in search display: "${shortsReelShelfDisplay}" (Expected: "none")`);
     console.log(`     - Suggested shelf display: "${suggestedShelfDisplay}" (Expected: "none")`);
     console.log(`     - CRITICAL: Genuine search result item display: "${searchResultDisplay}" (Expected: not "none")`);
 
+    if (shortsSearchDisplay !== 'none') {
+      throw new Error('Shorts video card in search results was not hidden!');
+    }
+    if (shortsBadgeDisplay !== 'none') {
+      throw new Error('Shorts badge card in search results was not hidden!');
+    }
+    if (shortsReelShelfDisplay !== 'none') {
+      throw new Error('Shorts reel shelf in search results was not hidden!');
+    }
     if (suggestedShelfDisplay !== 'none') {
       throw new Error('Search recommendation shelf was not hidden!');
     }
     if (searchResultDisplay === 'none') {
       throw new Error('OVERBLOCKING BUG: Genuine search results were hidden!');
+    }
+
+    // Scenario D: Active on Direct Shorts Route
+    await testClient.eval(`document.documentElement.dataset.focusRoute = "shorts";`);
+    const directShortsContainerDisplay = await testClient.eval('window.getComputedStyle(document.getElementById("direct-shorts-container")).display');
+    console.log('  -> [YouTube Direct Shorts Route Active]');
+    console.log(`     - Direct shorts background container display: "${directShortsContainerDisplay}" (Expected: "none")`);
+    if (directShortsContainerDisplay !== 'none') {
+      throw new Error('Direct shorts container was not hidden on shorts route!');
     }
 
     // Scenario D: Filter Paused / Disabled

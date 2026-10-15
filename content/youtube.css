@@ -7,22 +7,32 @@
    1. BLOCK SHORTS
    ========================================================================== */
 
-/* Shorts shelves on Home, Subscriptions, Search, and Channels */
+/* Shorts shelves, cards, and carousels on Home, Search Results, Subscriptions, and Channels */
 html[data-focus-active="true"][data-focus-block-shorts="true"] ytd-rich-shelf-renderer[is-shorts],
 html[data-focus-active="true"][data-focus-block-shorts="true"] ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[is-shorts]),
 html[data-focus-active="true"][data-focus-block-shorts="true"] ytd-reel-shelf-renderer,
+html[data-focus-active="true"][data-focus-block-shorts="true"] ytd-reel-item-renderer,
 html[data-focus-active="true"][data-focus-block-shorts="true"] ytd-rich-item-renderer:has(ytd-reel-item-renderer),
-html[data-focus-active="true"][data-focus-block-shorts="true"] ytd-rich-item-renderer:has(a[href^="/shorts"]),
-html[data-focus-active="true"][data-focus-block-shorts="true"] ytd-video-renderer:has(a[href^="/shorts"]),
-html[data-focus-active="true"][data-focus-block-shorts="true"] ytd-grid-video-renderer:has(a[href^="/shorts"]),
-html[data-focus-active="true"][data-focus-block-shorts="true"] ytd-notification-renderer:has(a[href^="/shorts"]) {
+html[data-focus-active="true"][data-focus-block-shorts="true"] ytd-rich-item-renderer:has(a[href*="/shorts/"]),
+html[data-focus-active="true"][data-focus-block-shorts="true"] ytd-video-renderer:has(a[href*="/shorts/"]),
+html[data-focus-active="true"][data-focus-block-shorts="true"] ytd-video-renderer:has([overlay-style="SHORTS"]),
+html[data-focus-active="true"][data-focus-block-shorts="true"] ytd-compact-video-renderer:has(a[href*="/shorts/"]),
+html[data-focus-active="true"][data-focus-block-shorts="true"] ytd-grid-video-renderer:has(a[href*="/shorts/"]),
+html[data-focus-active="true"][data-focus-block-shorts="true"] ytd-notification-renderer:has(a[href*="/shorts/"]),
+html[data-focus-active="true"][data-focus-block-shorts="true"] [data-focus-is-short="true"] {
+  display: none !important;
+}
+
+/* Background Shorts infinite feed container on direct Shorts route */
+html[data-focus-active="true"][data-focus-block-shorts="true"][data-focus-route="shorts"] ytd-shorts,
+html[data-focus-active="true"][data-focus-block-shorts="true"][data-focus-route="shorts"] #shorts-container {
   display: none !important;
 }
 
 /* Shorts Navigation Entries (Desktop Guide & Mini-Guide) */
-html[data-focus-active="true"][data-focus-block-shorts="true"] ytd-guide-entry-renderer:has(a[href^="/shorts"]),
+html[data-focus-active="true"][data-focus-block-shorts="true"] ytd-guide-entry-renderer:has(a[href*="/shorts"]),
 html[data-focus-active="true"][data-focus-block-shorts="true"] ytd-mini-guide-entry-renderer[aria-label*="Shorts"],
-html[data-focus-active="true"][data-focus-block-shorts="true"] ytd-mini-guide-entry-renderer:has(a[href^="/shorts"]),
+html[data-focus-active="true"][data-focus-block-shorts="true"] ytd-mini-guide-entry-renderer:has(a[href*="/shorts"]),
 html[data-focus-active="true"][data-focus-block-shorts="true"] a#endpoint[title="Shorts"],
 html[data-focus-active="true"][data-focus-block-shorts="true"] a[title="Shorts"] {
   display: none !important;
